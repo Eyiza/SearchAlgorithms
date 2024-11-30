@@ -11,8 +11,7 @@ import heapq
     For a min-heap, the smallest element is at the root i.e for every node, the value of its children is greater than or equal to the value of the node.
     For a max-heap, the largest element is at the root i.e for every node, the value of its children is less than or equal to the value of the node.
 """
-import networkx as nx # NetworkX is a Python package for the creation, manipulation, and study of the structure, dynamics, and functions of complex networks.
-import matplotlib.pyplot as plt # Matplotlib is a plotting library for the Python programming language and its numerical mathematics extension NumPy.
+from visualize import visualize_graph # Import the visualize_graph_as_tree function from the visualize.py file
 
 class Node:
     def __init__(self, state, parent=None, heuristic=0):
@@ -65,71 +64,6 @@ def reconstruct_path(node):
     path.reverse() # Reverse to get path from start to goal
     return path
 
-def binary_tree_layout(graph, root):
-    """
-    Create a layout for the graph to resemble a binary tree.
-
-    :param graph: networkx DiGraph
-    :param root: Root node of the binary tree
-    :return: Dictionary of positions for each node
-    """
-    def helper(node, depth=0, pos={}, x=0, spacing=1.5):
-        # Position for current node
-        pos[node] = (x, -depth)
-        neighbors = list(graph.successors(node))
-        if neighbors:
-            if len(neighbors) > 1:
-                # Spread children horizontally
-                left_x = x - spacing / 2
-                right_x = x + spacing / 2
-                helper(neighbors[0], depth + 1, pos, left_x, spacing / 2)
-                helper(neighbors[1], depth + 1, pos, right_x, spacing / 2)
-            else:
-                # Single child case
-                helper(neighbors[0], depth + 1, pos, x, spacing / 2)
-        return pos
-
-    return helper(root)
-
-def visualize_graph_as_tree(graph_dict, path, root):
-    """
-    Visualize the graph as a binary tree and highlight the chosen path.
-    
-    :param graph_dict: Dictionary representing the graph
-    :param path: List of nodes in the chosen path
-    :param root: Root node of the tree
-    """
-    G = nx.DiGraph()
-
-    # Add edges to the graph
-    for node, neighbors in graph_dict.items():
-        for neighbor in neighbors:
-            G.add_edge(node, neighbor)
-
-    # Create a binary tree layout
-    pos = binary_tree_layout(G, root)
-
-    # Define node colors
-    node_colors = []
-    for node in G.nodes():
-        if node in path:
-            node_colors.append('lightgreen')  # Highlight nodes in the path
-        else:
-            node_colors.append('lightblue')
-
-    # Define edge colors
-    edge_colors = []
-    for edge in G.edges():
-        if edge[0] in path and edge[1] in path and path.index(edge[1]) == path.index(edge[0]) + 1:
-            edge_colors.append('green')  # Highlight edges in the path
-        else:
-            edge_colors.append('black')
-
-    # Draw the graph
-    nx.draw(G, pos, with_labels=True, node_color=node_colors, edge_color=edge_colors, node_size=1500, font_size=12)
-    plt.title("Graph Visualization with Highlighted Path")
-    plt.show()
-
 # Example usage
 graph = {
     'A': ['B', 'C'],
@@ -142,7 +76,7 @@ graph = {
     'H': []
 }
 heuristic = {
-    'A': 6, 'B': 4, 'C': 4, 'D': 3, 'E': 2, 'F': 6, 'G': 6, 'H': 0
+    'A': 6, 'B': 3, 'C': 4, 'D': 3, 'E': 2, 'F': 6, 'G': 6, 'H': 0
 }
 
 start = 'A'
@@ -152,4 +86,4 @@ path = greedy_best_first_search(start, goal, graph, heuristic)
 print(f"Path from {start} to {goal}: {path}")
 
 # Visualize the graph and highlight the path
-visualize_graph_as_tree(graph, path, start)
+visualize_graph(graph, path, start, heuristic)
