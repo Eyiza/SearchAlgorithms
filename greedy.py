@@ -11,6 +11,8 @@ import heapq
     For a min-heap, the smallest element is at the root i.e for every node, the value of its children is greater than or equal to the value of the node.
     For a max-heap, the largest element is at the root i.e for every node, the value of its children is less than or equal to the value of the node.
 """
+import networkx as nx # NetworkX is a Python package for the creation, manipulation, and study of the structure, dynamics, and functions of complex networks.
+import matplotlib.pyplot as plt # Matplotlib is a plotting library for the Python programming language and its numerical mathematics extension NumPy.
 
 class Node:
     def __init__(self, state, parent=None, heuristic=0):
@@ -63,6 +65,42 @@ def reconstruct_path(node):
     path.reverse() # Reverse to get path from start to goal
     return path
 
+def visualize_graph(graph, path):
+    """
+    Visualize the graph and highlight the chosen path.
+    
+    :param graph: Dictionary representing the graph
+    :param path: List of nodes in the chosen path
+    """
+    G = nx.DiGraph()
+
+    # Add edges to the graph
+    for node, neighbors in graph.items():
+        for neighbor in neighbors:
+            G.add_edge(node, neighbor)
+
+    # Define node colors
+    node_colors = []
+    for node in G.nodes():
+        if node in path:
+            node_colors.append('lightgreen')  # Highlight nodes in the path
+        else:
+            node_colors.append('lightblue')
+
+    # Define edge colors
+    edge_colors = []
+    for edge in G.edges():
+        if edge[0] in path and edge[1] in path and path.index(edge[1]) == path.index(edge[0]) + 1:
+            edge_colors.append('green')  # Highlight edges in the path
+        else:
+            edge_colors.append('black')
+
+    # Draw the graph
+    pos = nx.spring_layout(G)  # Layout for better visualization
+    nx.draw(G, pos, with_labels=True, node_color=node_colors, edge_color=edge_colors, node_size=1500, font_size=12)
+    plt.title("Graph Visualization with Highlighted Path")
+    plt.show()
+
 # Example usage
 graph = {
     'A': ['B', 'C'],
@@ -83,3 +121,6 @@ goal = 'H'
 
 path = greedy_best_first_search(start, goal, graph, heuristic)
 print(f"Path from {start} to {goal}: {path}")
+
+# Visualize the graph and highlight the path
+visualize_graph(graph, path)
