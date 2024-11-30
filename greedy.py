@@ -65,19 +65,49 @@ def reconstruct_path(node):
     path.reverse() # Reverse to get path from start to goal
     return path
 
-def visualize_graph(graph, path):
+def binary_tree_layout(graph, root):
     """
-    Visualize the graph and highlight the chosen path.
+    Create a layout for the graph to resemble a binary tree.
+
+    :param graph: networkx DiGraph
+    :param root: Root node of the binary tree
+    :return: Dictionary of positions for each node
+    """
+    def helper(node, depth=0, pos={}, x=0, spacing=1.5):
+        # Position for current node
+        pos[node] = (x, -depth)
+        neighbors = list(graph.successors(node))
+        if neighbors:
+            if len(neighbors) > 1:
+                # Spread children horizontally
+                left_x = x - spacing / 2
+                right_x = x + spacing / 2
+                helper(neighbors[0], depth + 1, pos, left_x, spacing / 2)
+                helper(neighbors[1], depth + 1, pos, right_x, spacing / 2)
+            else:
+                # Single child case
+                helper(neighbors[0], depth + 1, pos, x, spacing / 2)
+        return pos
+
+    return helper(root)
+
+def visualize_graph_as_tree(graph_dict, path, root):
+    """
+    Visualize the graph as a binary tree and highlight the chosen path.
     
-    :param graph: Dictionary representing the graph
+    :param graph_dict: Dictionary representing the graph
     :param path: List of nodes in the chosen path
+    :param root: Root node of the tree
     """
     G = nx.DiGraph()
 
     # Add edges to the graph
-    for node, neighbors in graph.items():
+    for node, neighbors in graph_dict.items():
         for neighbor in neighbors:
             G.add_edge(node, neighbor)
+
+    # Create a binary tree layout
+    pos = binary_tree_layout(G, root)
 
     # Define node colors
     node_colors = []
@@ -96,7 +126,6 @@ def visualize_graph(graph, path):
             edge_colors.append('black')
 
     # Draw the graph
-    pos = nx.spring_layout(G)  # Layout for better visualization
     nx.draw(G, pos, with_labels=True, node_color=node_colors, edge_color=edge_colors, node_size=1500, font_size=12)
     plt.title("Graph Visualization with Highlighted Path")
     plt.show()
@@ -123,4 +152,4 @@ path = greedy_best_first_search(start, goal, graph, heuristic)
 print(f"Path from {start} to {goal}: {path}")
 
 # Visualize the graph and highlight the path
-visualize_graph(graph, path)
+visualize_graph_as_tree(graph, path, start)
