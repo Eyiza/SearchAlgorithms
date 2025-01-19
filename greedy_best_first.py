@@ -10,18 +10,16 @@ import heapq
     Heaps are usually used to implement priority queues, where the smallest (or largest) element is always at the root of the tree.
     For a min-heap, the smallest element is at the root i.e for every node, the value of its children is greater than or equal to the value of the node.
     For a max-heap, the largest element is at the root i.e for every node, the value of its children is less than or equal to the value of the node.
+    An example is this:
+    Imagine you're lost in a forest, trying to find the tallest watchtower you can see on the horizon.
+    You would walk toward the direction where the tower seems closest, hoping that each step brings you nearer to your goal.
+    This is similar to how the greedy search algorithm works. It always selects the path which appears to be the best at that moment.
+    The heuristic in this case is the visible distance to the watchtower.
+
 """
 from visualize import visualize_graph # Import the visualize_graph_as_tree function from the visualize.py file
-
-class Node:
-    def __init__(self, state, parent=None, heuristic=0):
-        self.state = state
-        self.parent = parent
-        self.heuristic = heuristic
-
-    # Magic method that is used to define or implement the functionality of the less than operator "<"
-    def __lt__(self, other): 
-        return self.heuristic < other.heuristic
+# Import the Node class from the node.py file
+from node import Node, reconstruct_path
     
 
 def greedy_best_first_search(start, goal, graph, heuristics):
@@ -53,20 +51,6 @@ def greedy_best_first_search(start, goal, graph, heuristics):
                 heapq.heappush(priority_queue, Node(neighbor, current_node, heuristics[neighbor]))
 
     return None # If no path is found
-
-def reconstruct_path(node):
-    """
-    Reconstruct the path from start to goal using parent pointers.
-    
-    :param node: Goal node
-    :return: List representing the path from start to goal
-    """
-    path = []
-    while node:
-        path.append(node.state)
-        node = node.parent
-    path.reverse() # Reverse to get path from start to goal
-    return path
 
 # Example usage 
 graph = {
