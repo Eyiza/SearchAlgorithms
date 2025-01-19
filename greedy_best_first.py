@@ -33,9 +33,13 @@ def greedy_best_first_search(start, goal, graph, heuristics):
     # Visited set to avoid revisiting nodes. We use the set data structure to store unique elements.
     visited = set()
 
+    # While there's possible nodes to visit
     while priority_queue:
         current_node = heapq.heappop(priority_queue) # Pop and return the smallest item from the heap
         current_state = current_node.state
+
+        if current_state in visited:
+            continue
 
         # If the goal is reached, reconstruct the path
         if current_state == goal:
@@ -43,7 +47,7 @@ def greedy_best_first_search(start, goal, graph, heuristics):
         
         visited.add(current_state)
 
-        # Explore neighbors in the graph
+        # Explore neighbors in the graph i.e add the children of the node to the list of nodes to visit
         for neighbor in graph[current_state]:
             if neighbor not in visited:
                 heapq.heappush(priority_queue, Node(neighbor, current_node, heuristics[neighbor]))
@@ -64,7 +68,7 @@ def reconstruct_path(node):
     path.reverse() # Reverse to get path from start to goal
     return path
 
-# Example usage
+# Example usage 
 graph = {
     'A': ['B', 'C'],
     'B': ['D', 'E'],
