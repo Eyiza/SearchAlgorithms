@@ -1,14 +1,14 @@
 """
     Breadth First Search Algorithm is an algorithm used to traverse or search tree or graph data structures.
     It starts from the root node and explores all the nodes at the present depth before moving on to the nodes at the next depth level.
-    It uses a queue data structure to keep track of the nodes to visit.
+    It uses a queue (FIFO) data structure to keep track of the nodes to visit.
     An example is this: 
     If you are searching for a person in a family tree, you would start from the root node (the person at the top of the tree) and explore all the children of that person before moving on to the grandchildren
     or if you're trying to find a friend in a crowded stadium, you would check every row, one row at a time, ensuring you explore all the people on the first row before moving to the second row, then the third, and so on.
 """
 
 from collections import deque # Import the deque class from the collections module
-from visualize import visualize_graph # Import the visualize_graph_as_tree function from the visualize.py file
+from visualize import visualize_graph, run_animation_in_thread # Import the visualize_graph_as_tree function from the visualize.py file
 from node import Node, reconstruct_path
 
 def breadth_first_search(start, goal, graph):
@@ -19,6 +19,7 @@ def breadth_first_search(start, goal, graph):
 
     # Visited set to avoid revisiting nodes
     visited = set()
+    search_process = [] # List to store the search process for visualization
 
     # While there's possible nodes to visit
     while queue:
@@ -28,11 +29,14 @@ def breadth_first_search(start, goal, graph):
         if current_state in visited:
             continue
 
+        visited.add(current_state)
+        search_process.append(current_state)
+
         # If the goal is reached, reconstruct the path
         if current_state == goal:
-            return reconstruct_path(current_node)
-        
-        visited.add(current_state)
+            path = reconstruct_path(current_node)
+            run_animation_in_thread(graph, path, start, search_process)
+            return path        
 
         # Explore neighbors in the graph i.e add the children of the node to the list of nodes to visit
         for neighbor in graph[current_state]:

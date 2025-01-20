@@ -17,7 +17,7 @@ import heapq
     The heuristic in this case is the visible distance to the watchtower.
 
 """
-from visualize import visualize_graph # Import the visualize_graph_as_tree function from the visualize.py file
+from visualize import visualize_graph, run_animation_in_thread # Import the visualize_graph_as_tree function from the visualize.py file
 # Import the Node class from the node.py file
 from node import Node, reconstruct_path
     
@@ -30,6 +30,7 @@ def greedy_best_first_search(start, goal, graph, heuristics):
 
     # Visited set to avoid revisiting nodes. We use the set data structure to store unique elements.
     visited = set()
+    search_process = [] # List to store the search process for visualization
 
     # While there's possible nodes to visit
     while priority_queue:
@@ -39,11 +40,16 @@ def greedy_best_first_search(start, goal, graph, heuristics):
         if current_state in visited:
             continue
 
+        visited.add(current_state)
+        search_process.append(current_state)
+        # print(f"Visiting node: {current_state} with heuristic: {heuristics[current_state]}")
+
+
         # If the goal is reached, reconstruct the path
         if current_state == goal:
-            return reconstruct_path(current_node)
-        
-        visited.add(current_state)
+            path = reconstruct_path(current_node)
+            run_animation_in_thread(graph, path, start, search_process, heuristics)
+            return path
 
         # Explore neighbors in the graph i.e add the children of the node to the list of nodes to visit
         for neighbor in graph[current_state]:
@@ -53,18 +59,33 @@ def greedy_best_first_search(start, goal, graph, heuristics):
     return None # If no path is found
 
 # Example usage 
+# graph = {
+#     'A': ['B', 'C'],
+#     'B': ['D', 'E'],
+#     'C': ['F', 'G'],
+#     'D': [],
+#     'E': ['H'],
+#     'F': [],
+#     'G': [],
+#     'H': []
+# }
+# heuristic = {
+#     'A': 6, 'B': 3, 'C': 4, 'D': 3, 'E': 2, 'F': 6, 'G': 6, 'H': 0
+# }
+
+# Example usage 2 to demonstrate path is not optimal
 graph = {
     'A': ['B', 'C'],
     'B': ['D', 'E'],
     'C': ['F', 'G'],
     'D': [],
     'E': ['H'],
-    'F': [],
+    'F': ['H'],
     'G': [],
     'H': []
 }
 heuristic = {
-    'A': 6, 'B': 3, 'C': 4, 'D': 3, 'E': 2, 'F': 6, 'G': 6, 'H': 0
+    'A': 6, 'B': 3, 'C': 4, 'D': 6, 'E': 4, 'F': 2, 'G': 6, 'H': 0
 }
 
 start = 'A'
@@ -74,4 +95,4 @@ path = greedy_best_first_search(start, goal, graph, heuristic)
 print(f"Path from {start} to {goal}: {path}")
 
 # Visualize the graph and highlight the path
-visualize_graph(graph, path, start, heuristic)
+# visualize_graph(graph, path, start, heuristic)
